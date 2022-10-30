@@ -20,7 +20,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 
 object Api {
-    private const val BASE_URL = "http://localhost:8080"
+    private const val BASE_URL = "https://gakusai.yt8492.com/api"
     private val client = HttpClient(Js) {
         install(ContentNegotiation) {
             json(
