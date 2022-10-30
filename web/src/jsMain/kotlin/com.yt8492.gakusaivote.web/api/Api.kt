@@ -8,6 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.js.Js
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -48,5 +49,10 @@ object Api {
             setBody(CreateTeamInput(name, description))
             contentType(ContentType.Application.Json)
         }.body()
+    }
+
+    suspend fun getTeams(): List<Team> {
+        return client.get("$BASE_URL/teams")
+            .body()
     }
 }

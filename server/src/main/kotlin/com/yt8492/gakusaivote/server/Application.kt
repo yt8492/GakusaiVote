@@ -20,6 +20,7 @@ import io.ktor.server.request.header
 import io.ktor.server.request.path
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
@@ -78,6 +79,10 @@ fun Application.module() {
                 return@post
             }
             call.respond(team)
+        }
+        get("/teams") {
+            val teams = teamRepository.findAll()
+            call.respond(teams)
         }
     }
 }

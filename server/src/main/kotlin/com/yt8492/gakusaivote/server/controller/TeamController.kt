@@ -26,4 +26,8 @@ class TeamController(
         teamRepository.create(team)
         return team
     }
+
+    fun findAllTeam(): List<Team> {
+        return teamRepository.findAll()
+    }
 }
