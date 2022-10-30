@@ -5,3 +5,4 @@
 /common/build/classes/kotlin/jvm/main/
 /server/build/
 /web/build/
+/credentials.json

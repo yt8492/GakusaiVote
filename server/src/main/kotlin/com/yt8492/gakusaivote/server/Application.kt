@@ -1,10 +1,14 @@
 package com.yt8492.gakusaivote.server
 
 import com.google.cloud.datastore.DatastoreOptions
+import com.yt8492.gakusaivote.common.model.CreateTeamInput
 import com.yt8492.gakusaivote.common.model.serializer.DateTimeSerializer
+import com.yt8492.gakusaivote.server.controller.TeamController
 import com.yt8492.gakusaivote.server.controller.UserController
+import com.yt8492.gakusaivote.server.repository.TeamRepository
 import com.yt8492.gakusaivote.server.repository.UserRepository
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
@@ -12,7 +16,9 @@ import io.ktor.server.application.install
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.request.header
 import io.ktor.server.request.path
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -41,16 +47,37 @@ fun Application.module() {
     install(CORS) {
         anyHost()
         allowMethod(HttpMethod.Post)
+        allowHeader("Authorization")
         allowSameOrigin = false
         allowNonSimpleContentTypes = true
     }
     val datastore = DatastoreOptions.getDefaultInstance().service
     val userRepository = UserRepository(datastore)
+    val teamRepository = TeamRepository(datastore)
     val userController = UserController(userRepository)
+    val teamController = TeamController(userRepository, teamRepository)
     routing {
         post("/user") {
             val user = userController.createUser()
             call.respond(user)
+        }
+        post("/teams") {
+            val createTeamInput = call.receive<CreateTeamInput>()
+            val leaderId = call.request.header("Authorization")?.removePrefix("Bearer ")
+            if (leaderId == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+            val team = teamController.createTeam(
+                leaderId = leaderId,
+                name = createTeamInput.name,
+                description = createTeamInput.description,
+            )
+            if (team == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+            call.respond(team)
         }
     }
 }

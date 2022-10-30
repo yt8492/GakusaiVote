@@ -1,6 +1,6 @@
 package com.yt8492.gakusaivote.web
 
-import com.yt8492.gakusaivote.web.pages.RootPage
+import com.yt8492.gakusaivote.web.components.RootPage
 import kotlinx.browser.document
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
