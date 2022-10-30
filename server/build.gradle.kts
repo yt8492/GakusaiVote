@@ -41,4 +41,16 @@ tasks {
     withType<KotlinCompile> {
         kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
+    withType<Sync> {
+        dependsOn(":web:jsBrowserProductionWebpack")
+        into("generated") {
+            from("${rootProject.project(":web").buildDir}/distributions")
+        }
+    }
+    withType<Zip> {
+        dependsOn(":web:jsBrowserProductionWebpack")
+        into("generated") {
+            from("${rootProject.project(":web").buildDir}/distributions")
+        }
+    }
 }
