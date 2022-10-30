@@ -5,8 +5,10 @@ import com.yt8492.gakusaivote.common.model.CreateTeamInput
 import com.yt8492.gakusaivote.common.model.serializer.DateTimeSerializer
 import com.yt8492.gakusaivote.server.controller.TeamController
 import com.yt8492.gakusaivote.server.controller.UserController
+import com.yt8492.gakusaivote.server.controller.VoteController
 import com.yt8492.gakusaivote.server.repository.TeamRepository
 import com.yt8492.gakusaivote.server.repository.UserRepository
+import com.yt8492.gakusaivote.server.repository.VoteRepository
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -55,8 +57,10 @@ fun Application.module() {
     val datastore = DatastoreOptions.getDefaultInstance().service
     val userRepository = UserRepository(datastore)
     val teamRepository = TeamRepository(datastore)
+    val voteRepository = VoteRepository(datastore)
     val userController = UserController(userRepository)
     val teamController = TeamController(userRepository, teamRepository)
+    val voteController = VoteController(voteRepository)
     routing {
         post("/user") {
             val user = userController.createUser()
@@ -83,6 +87,20 @@ fun Application.module() {
         get("/teams") {
             val teams = teamRepository.findAll()
             call.respond(teams)
+        }
+        post("/teams/{id}") {
+            val userId = call.request.header("Authorization")?.removePrefix("Bearer ")
+            if (userId == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+            val teamId = call.parameters["id"]
+            if (teamId == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+            voteController.vote(userId, teamId)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

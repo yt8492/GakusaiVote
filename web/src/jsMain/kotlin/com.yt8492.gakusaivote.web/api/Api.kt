@@ -55,4 +55,10 @@ object Api {
         return client.get("$BASE_URL/teams")
             .body()
     }
+
+    suspend fun vote(userId: String, teamId: String) {
+        client.post("$BASE_URL/teams/$teamId") {
+            header("Authorization", "Bearer $userId")
+        }
+    }
 }

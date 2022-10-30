@@ -79,6 +79,9 @@ fun RootPage() {
                 P {
                     Text("説明")
                 }
+                P {
+                    Text("投票")
+                }
             }
             team.forEach {
                 TeamRow(it)
